@@ -18,23 +18,25 @@ const signupSchema = zod.object({
 
 router.post("/signup", async (req, res) => {
     const body = req.body;
-    // console.log(body)
+    console.log(body)
 
     // return
     const { success } = signupSchema.safeParse(body)
     if (!success) {
         return res.status(411).json({
-            message: "Email already taken / Incorrect inputs"
+            message: "Email already taken / Incorrect inputs- wrong Schema"
+
         })
     }
 
     // here we are checking whether the user is already exists in the db base or not
-    const user = User.findOne({
+    const user = await User.findOne({
         username: body.username
     })
-    console.log(user.id)
+    // console.log(user.id)
 
-    if (user.id) {
+    const existingUser = user?.id || false
+    if (existingUser) {
         return res.json({
             message: "Email already taken / Incorrect inputs"
         })
