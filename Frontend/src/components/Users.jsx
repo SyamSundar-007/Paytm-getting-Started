@@ -1,25 +1,34 @@
 import { useState } from "react"
 import { Button } from "./Button"
+import { useEffect } from "react"
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 export const Users = (props) => {
 
-    const [users, setusers] = useState([{
-        firstName: "Syam",
-        lastName: "Sundar",
-        _id: 1
-    },{
-        firstName: "Syam",
-        lastName: "Sundar",
-        _id: 1
-    }])
+    const [users, setUsers] = useState([])
+    const [filterdata, setFilterData] = useState("")
 
+       useEffect(()=>{
+        axios.get("http://localhost:3000/api/v1/user/bulk?filter="+filterdata)
+       .then(response =>{
+        setUsers(response.data.user)
+       })
+      
+    
+    },[filterdata])
+
+//    console.log(users)
     return (
         <div className=" px-6">
             <div className="text-lg font-medium">Users</div>
             <div className="flex h-full justify-center  py-2">
-                <input type="text" placeholder="Search User....." className="w-full h-6 rounded border-b-2 border-gray-500  text-medium focus:outline-none focus:ring-2 ring-gray-500 "></input>
+                <input onChange={(e)=>{
+                    setFilterData(e.target.value)
+                }} type="text" placeholder="Search User....." className="w-full h-6 rounded border-b-2 border-gray-500  text-medium focus:outline-none focus:ring-2 ring-gray-500 "></input>
             </div>
             <div>
+                {console.log(users)}
                 {users.map((val) => <User user={val}/>)}
             </div>
 
@@ -30,6 +39,8 @@ export const Users = (props) => {
 
 
 function User(props) {
+
+    const navigate = useNavigate()
 
     const colorArray =["-gray-200","-green-200","-red-200","-blue-200"]
     const ranColor = colorArray[Math.floor(Math.random() * (3 - 0 + 1) ) + 0]
@@ -46,7 +57,9 @@ function User(props) {
                 </div>
             </div>
             <div className="w-30 h-20" >
-                <Button innerText={"Send Money"}></Button>
+                <Button onClick = {()=>{
+                     navigate("/send?id="+props.user._id+"&username="+props.user.firstName)
+                }} innerText={"Send Money"}></Button>
             </div>
         </div>
     )
